@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Coaching Dashboard · Spring 2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --engl:#3B82F6;--engl-bg:#0c1f3d;--engl-txt:#93c5fd;
+  --coll:#10B981;--coll-bg:#052e1c;--coll-txt:#6ee7b7;
+  --biz:#F59E0B;--biz-bg:#2d1a02;--biz-txt:#fcd34d;
+  --bg:#0f172a;--surf:#1e293b;--surf2:#263550;
+  --txt:#e2e8f0;--muted:#94a3b8;--border:#334155;
+  --gold:#f59e0b;
+  --sw:170px;--ww:220px;--hh:72px;
+}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:13px;overflow:hidden}
+
+/* ── Header ── */
+.hdr{position:fixed;top:0;left:0;right:0;height:var(--hh);background:var(--surf);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:16px;z-index:100}
+.hdr-title{font-size:17px;font-weight:800;white-space:nowrap}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.toggle-btn{background:var(--engl);color:#fff;border:none;border-radius:7px;padding:7px 15px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap}
+.toggle-btn:hover{filter:brightness(1.15)}
+.toggle-btn.on{background:#7c3aed}
+.legend{display:none;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.legend.show{display:flex}
+.leg-ttl{font-weight:700;color:var(--txt);margin-right:2px}
+.leg-item{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.leg-easy{background:#4ade80}.leg-mod{background:#facc15}.leg-hard{background:#fb923c}.leg-crit{background:#f87171}
+.leg-sep{color:var(--border);margin:0 2px}
+.leg-alert{display:flex;align-items:center;gap:4px;background:#450a0a;border:1px solid #ef4444;border-radius:4px;padding:2px 7px;font-size:10px;color:#fca5a5;white-space:nowrap}
+
+/* ── Calendar outer ── */
+.cal-outer{position:fixed;top:var(--hh);left:0;right:0;bottom:0;overflow:auto}
+.cal-outer::-webkit-scrollbar{width:7px;height:7px}
+.cal-outer::-webkit-scrollbar-track{background:var(--bg)}
+.cal-outer::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.cal-outer::-webkit-scrollbar-thumb:hover{background:#475569}
+.cal-outer::-webkit-scrollbar-corner{background:var(--bg)}
+
+/* ── Grid ── */
+.cal-grid{
+  display:grid;
+  grid-template-columns:var(--sw) repeat(11,var(--ww));
+  min-width:calc(var(--sw) + 11*var(--ww));
+}
+
+/* Corner */
+.g-corner{position:sticky;left:0;top:0;z-index:30;background:var(--surf);border-right:2px solid var(--border);border-bottom:2px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.g-corner-title{font-size:14px;font-weight:800}
+.g-corner-sub{font-size:10px;color:var(--muted)}
+
+/* Week header */
+.g-wk{position:sticky;top:0;z-index:20;background:var(--surf);border-right:1px solid var(--border);border-bottom:2px solid var(--border);padding:8px 10px;text-align:center;transition:border-bottom-color .2s}
+.g-wk.today{background:linear-gradient(135deg,#1c1714,#27200e);border-bottom-color:var(--gold)!important}
+.g-wk.load-heavy{border-bottom-color:#ef4444}
+.g-wk.load-mod{border-bottom-color:#f59e0b}
+.wk-label{display:block;font-size:13px;font-weight:800;margin-bottom:1px}
+.wk-dates{display:block;font-size:10px;color:var(--muted)}
+.wk-today-badge{display:inline-block;background:var(--gold);color:#0f172a;font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.wk-loadbar{height:3px;border-radius:2px;margin-top:5px;background:#1e293b;display:none}
+body.coach .wk-loadbar{display:block}
+.wk-loadbar.heavy{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.wk-loadbar.mod{background:linear-gradient(90deg,#f59e0b,#d97706)}
+.wk-loadbar.light{background:#334155}
+
+/* Course label */
+.g-lbl{position:sticky;left:0;z-index:10;background:var(--surf);border-right:2px solid var(--border);border-bottom:1px solid var(--border);padding:12px 10px 12px 14px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-height:130px}
+.lbl-code{font-size:14px;font-weight:800}
+.lbl-name{font-size:11px;color:var(--muted);line-height:1.3}
+.lbl-sched{font-size:10px;color:var(--muted);margin-top:1px;line-height:1.4}
+
+/* Assignment cell */
+.g-cell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:7px;display:flex;flex-direction:column;gap:5px;min-height:130px;background:var(--bg);transition:background .2s}
+.g-cell.today{background:#161109}
+.g-cell.empty{background:var(--bg)}
+
+/* Card */
+.card{border-radius:6px;padding:6px 8px 6px 10px;font-size:11px;cursor:pointer;transition:transform .1s,box-shadow .1s;position:relative;border-left:3px solid transparent;line-height:1.35}
+.card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.45);z-index:5}
+.card-name{font-weight:700;display:block;margin-bottom:2px}
+.card-time{font-size:9px;opacity:.7;display:block}
+
+/* Course card colors */
+.c-engl125{background:var(--engl-bg);border-left-color:var(--engl);color:var(--engl-txt)}
+.c-coll140{background:var(--coll-bg);border-left-color:var(--coll);color:var(--coll-txt)}
+.c-biz{background:var(--biz-bg);border-left-color:var(--biz);color:var(--biz-txt)}
+.c-special{background:#1e293b;border-left-color:#475569;color:#64748b;font-style:italic}
+
+/* Coach view difficulty overlays */
+body.coach .card:not(.c-special){border-left-width:4px}
+body.coach .d-easy{background:rgba(74,222,128,.12);border-left-color:#4ade80}
+body.coach .d-mod{background:rgba(250,204,21,.1);border-left-color:#facc15}
+body.coach .d-hard{background:rgba(251,146,60,.13);border-left-color:#fb923c}
+body.coach .d-crit{background:rgba(248,113,113,.15);border-left-color:#f87171}
+
+/* Coach alert badge */
+.alert-badge{display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;font-size:8px;font-weight:800;padding:2px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:.4px;z-index:6;white-space:nowrap;line-height:1.4}
+body.coach .alert-badge{display:block}
+
+/* Score chip in coach view */
+.score-chip{display:none;font-size:9px;font-weight:700;margin-top:3px}
+body.coach .score-chip{display:block}
+.score-chip.d-easy{color:#4ade80}.score-chip.d-mod{color:#facc15}.score-chip.d-hard{color:#fb923c}.score-chip.d-crit{color:#f87171}
+
+/* ── Modal ── */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal-box{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:430px;width:90%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.55)}
+.modal-x{position:absolute;top:12px;right:12px;background:var(--surf2);border:none;color:var(--muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;line-height:1;transition:color .15s}
+.modal-x:hover{color:var(--txt)}
+.modal-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;display:inline-block;margin-bottom:10px}
+.modal-title{font-size:19px;font-weight:800;margin-bottom:5px;line-height:1.2}
+.modal-due{font-size:12px;color:var(--muted);margin-bottom:14px}
+.modal-alert{background:rgba(239,68,68,.13);border:1px solid rgba(239,68,68,.4);border-radius:8px;padding:8px 12px;font-size:12px;color:#fca5a5;margin-bottom:12px;display:none}
+.modal-alert.show{display:block}
+.modal-alert::before{content:'⚠ Coach Alert — Historical pass rate below 65%';display:block;font-weight:700;margin-bottom:2px}
+.modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-box{background:var(--bg);border-radius:8px;padding:11px 13px}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-val{font-size:24px;font-weight:800;line-height:1}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.stat-val.easy{color:#4ade80}.stat-val.mod{color:#facc15}.stat-val.hard{color:#fb923c}.stat-val.crit{color:#f87171}
+.modal-nosubmit{background:var(--bg);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:14px}
+.modal-note{background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 13px;font-size:12px;color:#fde68a;line-height:1.55}
+.modal-note-lbl{font-weight:700;display:block;margin-bottom:3px;color:#f59e0b}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Academic Coaching Dashboard</div>
+    <div class="hdr-sub">Spring 2026 &nbsp;·&nbsp; 3 Courses &nbsp;·&nbsp; Apr 7 – Jun 19</div>
+  </div>
+  <div class="hdr-right">
+    <div class="legend" id="legend">
+      <span class="leg-ttl">Difficulty:</span>
+      <div class="leg-item"><div class="leg-dot leg-easy"></div>Easy (≥85%)</div>
+      <div class="leg-item"><div class="leg-dot leg-mod"></div>Moderate (75–84%)</div>
+      <div class="leg-item"><div class="leg-dot leg-hard"></div>Hard (65–74%)</div>
+      <div class="leg-item"><div class="leg-dot leg-crit"></div>Critical (&lt;65%)</div>
+      <span class="leg-sep">|</span>
+      <div class="leg-alert">⚠ Coach Alert = pass rate &lt;65%</div>
+    </div>
+    <button class="toggle-btn" id="toggleBtn" onclick="toggleView()">Switch to Coach View</button>
+  </div>
+</div>
+
+<div class="cal-outer" id="calOuter">
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<div class="modal-ov" id="modalOv" onclick="maybeClose(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-x" onclick="closeModal()">&#215;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const TODAY = new Date('2026-04-28T12:00:00');
+
+const COURSES = [
+  {id:'engl125', code:'ENGL 125', name:'English Composition',    sched:'Mon/Wed · Fridays 11:59 PM EST', color:'#3B82F6', txtColor:'#93c5fd'},
+  {id:'coll140', code:'COLL 140', name:'Purpose Driven Life',    sched:'Mon/Wed · Sundays 11:00 PM ET',  color:'#10B981', txtColor:'#6ee7b7'},
+  {id:'biz',     code:'Intro to Business', name:'Business Fundamentals', sched:'Mon/Wed · Per schedule 11:30 PM ET', color:'#F59E0B', txtColor:'#fcd34d'},
+];
+
+const WEEKS = [
+  {label:'Week 1',  start:'2026-04-07', end:'2026-04-13', range:'Apr 7–13'},
+  {label:'Week 2',  start:'2026-04-14', end:'2026-04-20', range:'Apr 14–20'},
+  {label:'Week 3',  start:'2026-04-21', end:'2026-04-27', range:'Apr 21–27'},
+  {label:'Week 4',  start:'2026-04-28', end:'2026-05-04', range:'Apr 28 – May 4'},
+  {label:'Week 5',  start:'2026-05-05', end:'2026-05-11', range:'May 5–11'},
+  {label:'Week 6',  start:'2026-05-12', end:'2026-05-18', range:'May 12–18'},
+  {label:'Week 7',  start:'2026-05-19', end:'2026-05-25', range:'May 19–25'},
+  {label:'Week 8',  start:'2026-05-26', end:'2026-06-01', range:'May 26 – Jun 1'},
+  {label:'Week 9',  start:'2026-06-02', end:'2026-06-08', range:'Jun 2–8'},
+  {label:'Week 10', start:'2026-06-09', end:'2026-06-15', range:'Jun 9–15'},
+  {label:'Finals',  start:'2026-06-16', end:'2026-06-22', range:'Jun 16–22'},
+];
+
+// score = historical avg (0-100), pass = historical pass rate (0-100)
+// note = coach note shown in modal
+const A = [
+  // ── ENGL 125 ──
+  {id:'e1', c:'engl125', name:'Journal 1',              due:'2026-04-11', time:'Fri Apr 11 · 11:59 PM EST', score:88, pass:94, note:'Early journal — most students complete on time. Good engagement indicator for the semester.'},
+  {id:'e2', c:'engl125', name:'Journal 2',              due:'2026-04-18', time:'Fri Apr 18 · 11:59 PM EST', score:85, pass:91, note:'Remind students to review feedback from Journal 1 before submitting Journal 2.'},
+  {id:'e3', c:'engl125', name:'Journal 3',              due:'2026-04-25', time:'Fri Apr 25 · 11:59 PM EST', score:82, pass:88, note:'Send reminder mid-week. Some students begin missing journals around this point.'},
+  {id:'e4', c:'engl125', name:'Journal 4',              due:'2026-05-02', time:'Fri May 2 · 11:59 PM EST',  score:78, pass:83, note:'Heavy week — 3 submissions due on the same day. Remind students to plan ahead early in the week.'},
+  {id:'e5', c:'engl125', name:'Unit 1 Final',           due:'2026-05-02', time:'Fri May 2 · 11:59 PM EST',  score:70, pass:62, note:'Students often miss this — send reminder 3 days before. High-stakes submission with historically low pass rate. Personal outreach recommended.'},
+  {id:'e6', c:'engl125', name:'Memo',                   due:'2026-05-02', time:'Fri May 2 · 11:59 PM EST',  score:74, pass:78, note:'Memo format confuses students. Clarify formatting expectations in a coaching session before the due date.'},
+  {id:'e7', c:'engl125', name:'Journal 5',              due:'2026-05-09', time:'Fri May 9 · 11:59 PM EST',  score:80, pass:85, note:'Mid-semester engagement dip. Check in on students who missed Journal 3 or 4.'},
+  {id:'e8', c:'engl125', name:'Unit 2 Draft',           due:'2026-05-09', time:'Fri May 9 · 11:59 PM EST',  score:75, pass:79, note:'Drafts often receive lower scores; emphasize effort over perfection. Encourage early submission to get instructor feedback.'},
+  {id:'e9', c:'engl125', name:'Journal 6',              due:'2026-05-16', time:'Fri May 16 · 11:59 PM EST', score:79, pass:84, note:'Steady assignment — monitor for late submissions. Good check-in opportunity.'},
+  {id:'e10',c:'engl125', name:'Journal 7',              due:'2026-05-23', time:'Fri May 23 · 11:59 PM EST', score:76, pass:80, note:'Late-semester fatigue begins. Send a motivational message and remind students of finish line.'},
+  {id:'e11',c:'engl125', name:'Unit 2 Final',           due:'2026-05-23', time:'Fri May 23 · 11:59 PM EST', score:67, pass:61, note:'Students often miss this — send reminder 3 days before. Historically very weak. Follow up personally with at-risk students.'},
+  {id:'e12',c:'engl125', name:'Memo',                   due:'2026-05-23', time:'Fri May 23 · 11:59 PM EST', score:71, pass:74, note:'Second memo — reinforce format expectations again. Reference instructor feedback from Unit 1 memo.'},
+  {id:'e13',c:'engl125', name:'Journal 8',              due:'2026-05-30', time:'Fri May 30 · 11:59 PM EST', score:74, pass:78, note:'End of semester — watch for disengagement. Many students stop journaling at this point.'},
+  {id:'e14',c:'engl125', name:'Unit 3 Draft',           due:'2026-05-30', time:'Fri May 30 · 11:59 PM EST', score:69, pass:63, note:'Students often miss this — send reminder 3 days before. Draft quality drops late semester. Offer office hours or study session.'},
+  {id:'e15',c:'engl125', name:'Unit 3 Final',           due:'2026-06-06', time:'Sat Jun 6 · 11:59 PM EST',  score:65, pass:60, note:'Students often miss this — send reminder 3 days before. Major final — coordinate with instructor. All hands on deck for coaching support.'},
+  {id:'e16',c:'engl125', name:'Revision Week (no sub)', due:'2026-06-13', time:'— no submission —',         score:null, pass:null, note:'No graded submission this week. Use the time to review drafts, follow up on at-risk students, and prep Final Submission reminders.'},
+  {id:'e17',c:'engl125', name:'Final Submission Window',due:'2026-06-19', time:'Jun 15–19 · window',        score:72, pass:68, note:'Multi-day window — remind students daily. Many wait until the final hours. Confirm submission receipt.'},
+
+  // ── COLL 140 ──
+  {id:'c1', c:'coll140', name:'App #1 Campus Academy',  due:'2026-04-12', time:'Sun Apr 12 · 11:00 PM ET', score:91, pass:96, note:'First app — excellent completion rate. Flag any non-submitters immediately as early disengagement predictor.'},
+  {id:'c2', c:'coll140', name:'App #2 Syllabi',         due:'2026-04-12', time:'Sun Apr 12 · 11:00 PM ET', score:93, pass:97, note:'Administrative task — nearly universal completion. Missing students are often not logging in at all.'},
+  {id:'c3', c:'coll140', name:'App #3 Technical Literacy',due:'2026-04-12',time:'Sun Apr 12 · 11:00 PM ET', score:88, pass:93, note:'Some students struggle with technology tasks. Offer LMS navigation support resources early.'},
+  {id:'c4', c:'coll140', name:'App #4 Time Management', due:'2026-04-19', time:'Sun Apr 19 · 11:00 PM ET', score:85, pass:90, note:'Reinforce time-management strategies in coaching sessions this week. Tie to other course deadlines.'},
+  {id:'c5', c:'coll140', name:'App #5 Note-Taking',     due:'2026-04-19', time:'Sun Apr 19 · 11:00 PM ET', score:84, pass:89, note:'Strong engagement — students find this practical. Connect concepts to their other courses.'},
+  {id:'c6', c:'coll140', name:'App #6 Studying',        due:'2026-04-26', time:'Sun Apr 26 · 11:00 PM ET', score:82, pass:87, note:'Remind students about active study strategies. Tie to upcoming exam season.'},
+  {id:'c7', c:'coll140', name:'App #7 Academic Integrity',due:'2026-04-26',time:'Sun Apr 26 · 11:00 PM ET', score:80, pass:85, note:'Critical content — ensure students fully understand plagiarism and academic integrity policies before finals.'},
+  {id:'c8', c:'coll140', name:'App #8 Stress Management',due:'2026-05-03',time:'Sun May 3 · 11:00 PM ET',  score:77, pass:81, note:'Mid-semester stress spike is common here. Proactively connect students with counseling and wellness resources.'},
+  {id:'c9', c:'coll140', name:'App #9 Purposeful Futures',due:'2026-05-10',time:'Sun May 10 · 11:00 PM ET', score:74, pass:78, note:'Reflective assignment — engagement varies. Encourage personal connection to goals and values in coaching session.'},
+  {id:'c10',c:'coll140', name:'App #10 Budget',         due:'2026-05-17', time:'Sun May 17 · 11:00 PM ET', score:71, pass:74, note:'Financial literacy content — some students find this anxiety-inducing. Be sensitive and focus on empowerment.'},
+  {id:'c11',c:'coll140', name:'App #11 Savings Goals',  due:'2026-05-17', time:'Sun May 17 · 11:00 PM ET', score:68, pass:64, note:'Students often miss this — send reminder 3 days before. Completion rate drops later in semester.'},
+  {id:'c12',c:'coll140', name:'App #12 Debt Management',due:'2026-05-24', time:'Sun May 24 · 11:00 PM ET', score:65, pass:61, note:'Students often miss this — send reminder 3 days before. Historically lowest engagement. Personal outreach strongly recommended.'},
+  {id:'c13',c:'coll140', name:'App #13 Progress Report',due:'2026-05-24', time:'Sun May 24 · 11:00 PM ET', score:70, pass:68, note:'Self-assessment report — use student responses to identify at-risk cases for end-of-semester intervention.'},
+
+  // ── Intro to Business ──
+  {id:'b0', c:'biz', name:'Discussion 0',          due:'2026-04-10', time:'Thu Apr 10 · 11:30 PM ET', score:89, pass:95, note:'Intro discussion — very high completion. Sets tone for course participation. Flag non-submitters.'},
+  {id:'b1', c:'biz', name:'Discussion 1',          due:'2026-04-12', time:'Sun Apr 12 · 11:30 PM ET', score:87, pass:93, note:'Strong early engagement. Watch for thin or low-effort responses that may predict disengagement.'},
+  {id:'b2', c:'biz', name:'Quiz: Syllabus & Book', due:'2026-04-12', time:'Sun Apr 12 · 11:30 PM ET', score:86, pass:92, note:'Syllabus quiz — mostly administrative. Students who miss this often go on to miss other early work.'},
+  {id:'b3', c:'biz', name:'Quiz: Ch 1&2',          due:'2026-04-13', time:'Mon Apr 13 · 11:30 PM ET', score:82, pass:88, note:'First content quiz — sets the academic tone. Review core concepts in coaching session beforehand.'},
+  {id:'b4', c:'biz', name:'Paper A',               due:'2026-04-14', time:'Tue Apr 14 · 11:30 PM ET', score:76, pass:80, note:'First paper — reinforce writing expectations. Encourage use of the writing center for all papers.'},
+  {id:'b5', c:'biz', name:'Quiz: Ch 4&5',          due:'2026-04-20', time:'Sun Apr 20 · 11:30 PM ET', score:80, pass:85, note:'Review chapter materials with students before the quiz. These chapters introduce key business frameworks.'},
+  {id:'b6', c:'biz', name:'Project Pt 1',          due:'2026-04-21', time:'Mon Apr 21 · 11:30 PM ET', score:78, pass:82, note:'Project kickoff — ensure students fully understand project requirements and rubric before beginning.'},
+  {id:'b7', c:'biz', name:'Quiz: Ch 6&7',          due:'2026-04-27', time:'Sun Apr 27 · 11:30 PM ET', score:77, pass:81, note:'Students often underestimate preparation time for these chapters. Remind to start studying early.'},
+  {id:'b8', c:'biz', name:'Project Pt 2',          due:'2026-04-28', time:'Mon Apr 28 · 11:30 PM ET', score:73, pass:76, note:'Second project milestone — check in on progress early in the week. Many students wait until the last day.'},
+  {id:'b9', c:'biz', name:'Quiz: Ch 8',            due:'2026-05-04', time:'Mon May 4 · 11:30 PM ET',  score:79, pass:83, note:'Solid chapter — most students do well. Good opportunity to give positive reinforcement.'},
+  {id:'b10',c:'biz', name:'Project Pt 3',          due:'2026-05-05', time:'Tue May 5 · 11:30 PM ET',  score:72, pass:75, note:'Project midpoint — remind students to start early. Rushed submissions show significant quality drop.'},
+  {id:'b11',c:'biz', name:'Quiz: Ch 9',            due:'2026-05-11', time:'Mon May 11 · 11:30 PM ET', score:75, pass:79, note:'Mid-semester quiz — review complex concepts with students in coaching session this week.'},
+  {id:'b12',c:'biz', name:'Discussion 2',          due:'2026-05-14', time:'Thu May 14 · 11:30 PM ET', score:84, pass:89, note:'Discussion engagement typically strong mid-semester. Encourage substantive, cited responses.'},
+  {id:'b13',c:'biz', name:'Quiz: Ch 10',           due:'2026-05-18', time:'Sun May 18 · 11:30 PM ET', score:74, pass:78, note:'Complex chapter — encourage office hours attendance before this quiz. Many abstract concepts.'},
+  {id:'b14',c:'biz', name:'Project Pt 4',          due:'2026-05-19', time:'Mon May 19 · 11:30 PM ET', score:69, pass:63, note:'Students often miss this — send reminder 3 days before. Late-semester project fatigue. Consider requiring a check-in meeting.'},
+  {id:'b15',c:'biz', name:'Quiz: Ch 11',           due:'2026-05-25', time:'Sun May 25 · 11:30 PM ET', score:76, pass:79, note:'Review quiz terminology before submission. Chapter 11 has tricky specialized vocabulary.'},
+  {id:'b16',c:'biz', name:'Discussion 3',          due:'2026-05-30', time:'Sat May 30 · 11:30 PM ET', score:81, pass:86, note:'Discussion participation may dip late semester — send engagement reminder earlier in the week.'},
+  {id:'b17',c:'biz', name:'Quiz: Ch 14',           due:'2026-06-01', time:'Mon Jun 1 · 11:30 PM ET',  score:71, pass:72, note:'Chapter 14 concepts are abstract. Consider organizing a virtual study group session before deadline.'},
+  {id:'b18',c:'biz', name:'Project Pt 5',          due:'2026-06-02', time:'Tue Jun 2 · 11:30 PM ET',  score:66, pass:60, note:'Students often miss this — send reminder 3 days before. Final project part — many students rush the conclusion. Review rubric in coaching session.'},
+  {id:'b19',c:'biz', name:'Discussion 4',          due:'2026-06-05', time:'Fri Jun 5 · 11:30 PM ET',  score:78, pass:82, note:'Late-semester discussion — keep students engaged and remind them every point counts.'},
+  {id:'b20',c:'biz', name:'Paper B',               due:'2026-06-08', time:'Mon Jun 8 · 11:30 PM ET',  score:67, pass:63, note:'Students often miss this — send reminder 3 days before. Writing quality drops end of semester. Emphasize grade impact.'},
+  {id:'b21',c:'biz', name:'Paper C',               due:'2026-06-09', time:'Tue Jun 9 · 11:30 PM ET',  score:65, pass:59, note:'Students often miss this — send reminder 3 days before. Back-to-back paper days — help students manage workload explicitly.'},
+  {id:'b22',c:'biz', name:'Discussion 5',          due:'2026-06-12', time:'Fri Jun 12 · 11:30 PM ET', score:75, pass:78, note:'Final discussion — encourage meaningful reflection on course learning. Participation often strong if prompted.'},
+  {id:'b23',c:'biz', name:'Quiz Ch 3',             due:'2026-06-18', time:'Thu Jun 18 · 11:30 PM ET', score:70, pass:72, note:'Late-semester quiz — many students are distracted near end of term. Early and repeated reminders critical.'},
+  {id:'b24',c:'biz', name:'Paper D',               due:'2026-06-18', time:'Thu Jun 18 · 11:30 PM ET', score:64, pass:58, note:'Students often miss this — send reminder 3 days before. Final paper and highest-stakes writing assignment. All coaching resources should be directed here.'},
+];
+
+// ── Utilities ──────────────────────────────────────────────
+function weekOf(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  for (let i = 0; i < WEEKS.length; i++) {
+    if (d >= new Date(WEEKS[i].start + 'T00:00:00') && d <= new Date(WEEKS[i].end + 'T23:59:59')) return i;
+  }
+  return -1;
+}
+
+function diff(score) {
+  if (score === null) return '';
+  if (score >= 85) return 'easy';
+  if (score >= 75) return 'mod';
+  if (score >= 65) return 'hard';
+  return 'crit';
+}
+
+function diffLabel(d) { return {easy:'Easy',mod:'Moderate',hard:'Hard',crit:'Critical'}[d] || ''; }
+
+// ── Build grid ─────────────────────────────────────────────
+function build() {
+  const grid = document.getElementById('calGrid');
+  const todayWk = weekOf(TODAY.toISOString().split('T')[0]);
+
+  // Bucket: byWC[weekIdx][courseIdx] = [assignments]
+  const byWC = Array.from({length:11}, () => Array.from({length:3}, () => []));
+  A.forEach(a => {
+    const wi = weekOf(a.due);
+    const ci = COURSES.findIndex(c => c.id === a.c);
+    if (wi >= 0 && ci >= 0) byWC[wi][ci].push(a);
+  });
+
+  // Compute week load for coach bars
+  const loads = WEEKS.map((_, wi) => {
+    let n = 0, crit = 0;
+    for (let ci = 0; ci < 3; ci++) {
+      byWC[wi][ci].forEach(a => {
+        n++;
+        if (a.pass !== null && a.pass < 65) crit++;
+        if (a.score !== null && a.score < 65) crit++;
+      });
+    }
+    if (n >= 7 || crit >= 3) return 'heavy';
+    if (n >= 4 || crit >= 1) return 'mod';
+    return 'light';
+  });
+
+  // Row 0: corner + week headers
+  const corner = el('div', 'g-corner', `<span class="g-corner-title">Courses</span><span class="g-corner-sub">Spring 2026</span>`);
+  grid.appendChild(corner);
+
+  WEEKS.forEach((wk, wi) => {
+    const isToday = wi === todayWk;
+    const ld = loads[wi];
+    const cell = el('div', `g-wk${isToday?' today':''}${!isToday && ld==='heavy'?' load-heavy':!isToday && ld==='mod'?' load-mod':''}`, `
+      <span class="wk-label">${wk.label}</span>
+      <span class="wk-dates">${wk.range}</span>
+      ${isToday ? '<span class="wk-today-badge">← Today</span>' : ''}
+      <div class="wk-loadbar ${ld}" id="lb${wi}"></div>
+    `);
+    grid.appendChild(cell);
+  });
+
+  // Rows 1–3: label + cells
+  COURSES.forEach((course, ci) => {
+    const lbl = el('div', 'g-lbl', `
+      <span class="lbl-code" style="color:${course.color}">${course.code}</span>
+      <span class="lbl-name">${course.name}</span>
+      <span class="lbl-sched">${course.sched}</span>
+    `);
+    lbl.style.borderLeft = `4px solid ${course.color}`;
+    grid.appendChild(lbl);
+
+    WEEKS.forEach((_, wi) => {
+      const isToday = wi === todayWk;
+      const assignments = byWC[wi][ci];
+      const cell = el('div', `g-cell${isToday?' today':''}${assignments.length===0?' empty':''}`);
+
+      assignments.forEach(a => {
+        const dc = diff(a.score);
+        const isAlert = a.pass !== null && a.pass < 65;
+        const isSpecial = a.score === null;
+        const card = el('div',
+          `card ${isSpecial ? 'c-special' : `c-${a.c} d-${dc}`}`,
+          `${isAlert ? '<span class="alert-badge">⚠ Alert</span>' : ''}
+           <span class="card-name">${a.name}</span>
+           <span class="card-time">${a.time}</span>
+           ${!isSpecial ? `<span class="score-chip d-${dc}">Avg ${a.score}% · Pass ${a.pass}%</span>` : ''}`
+        );
+        card.addEventListener('click', () => openModal(a, course));
+        cell.appendChild(card);
+      });
+
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function el(tag, cls, html = '') {
+  const e = document.createElement(tag);
+  e.className = cls;
+  e.innerHTML = html;
+  return e;
+}
+
+// ── Modal ──────────────────────────────────────────────────
+function openModal(a, course) {
+  const dc = diff(a.score);
+  const isAlert = a.pass !== null && a.pass < 65;
+  const isSpecial = a.score === null;
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-badge" style="background:${course.color}22;color:${course.color};border:1px solid ${course.color}44">${course.code}</div>
+    <div class="modal-title">${a.name}</div>
+    <div class="modal-due">Due: ${a.time}</div>
+    <div class="modal-alert ${isAlert ? 'show' : ''}"></div>
+    ${isSpecial
+      ? `<div class="modal-nosubmit">No graded submission this week.</div>`
+      : `<div class="modal-stats">
+           <div class="stat-box">
+             <div class="stat-lbl">Historical Avg Score</div>
+             <div class="stat-val ${dc}">${a.score}%</div>
+             <div class="stat-sub">${diffLabel(dc)} difficulty</div>
+           </div>
+           <div class="stat-box">
+             <div class="stat-lbl">Historical Pass Rate</div>
+             <div class="stat-val ${isAlert ? 'crit' : dc}">${a.pass}%</div>
+             <div class="stat-sub">${isAlert ? '⚠ Below 65% threshold' : 'Within range'}</div>
+           </div>
+         </div>`
+    }
+    <div class="modal-note"><span class="modal-note-lbl">📋 Coach Note</span>${a.note}</div>
+  `;
+  document.getElementById('modalOv').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOv').classList.remove('open'); }
+function maybeClose(e) { if (e.target === document.getElementById('modalOv')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── View toggle ────────────────────────────────────────────
+let coachOn = false;
+function toggleView() {
+  coachOn = !coachOn;
+  document.body.classList.toggle('coach', coachOn);
+  const btn = document.getElementById('toggleBtn');
+  btn.textContent = coachOn ? 'Switch to Student View' : 'Switch to Coach View';
+  btn.classList.toggle('on', coachOn);
+  document.getElementById('legend').classList.toggle('show', coachOn);
+}
+
+// ── Init ───────────────────────────────────────────────────
+build();
+
+// Scroll so Week 4 (today) is the first visible week after the sidebar
+setTimeout(() => {
+  const WW = 220; // --ww
+  const todayWk = weekOf(TODAY.toISOString().split('T')[0]);
+  // scroll = todayWkIndex * WW puts today-week right at left edge after sticky sidebar
+  document.getElementById('calOuter').scrollLeft = Math.max(0, (todayWk - 0.3) * WW);
+}, 80);
+</script>
+</body>
+</html>
