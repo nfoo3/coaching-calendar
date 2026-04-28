@@ -135,7 +135,7 @@ body.coach .score-chip{display:block}
 <div class="hdr">
   <div>
     <div class="hdr-title">Academic Coaching Dashboard</div>
-    <div class="hdr-sub">Spring 2026 &nbsp;·&nbsp; 3 Courses &nbsp;·&nbsp; Apr 7 – Jun 19</div>
+    <div class="hdr-sub">Spring 2026 &nbsp;·&nbsp; 3 Courses &nbsp;·&nbsp; Apr 6 – Jun 21</div>
   </div>
   <div class="hdr-right">
     <div class="legend" id="legend">
@@ -168,21 +168,21 @@ const TODAY = new Date('2026-04-28T12:00:00');
 const COURSES = [
   {id:'engl125', code:'ENGL 125', name:'English Composition',    sched:'Mon/Wed · Fridays 11:59 PM EST', color:'#3B82F6', txtColor:'#93c5fd'},
   {id:'coll140', code:'COLL 140', name:'Purpose Driven Life',    sched:'Mon/Wed · Sundays 11:00 PM ET',  color:'#10B981', txtColor:'#6ee7b7'},
-  {id:'biz',     code:'Intro to Business', name:'Business Fundamentals', sched:'Mon/Wed · Per schedule 11:30 PM ET', color:'#F59E0B', txtColor:'#fcd34d'},
+  {id:'biz',     code:'BUSN 105', name:'Introduction to Business', sched:'Mon/Wed · Per schedule 11:30 PM ET', color:'#F59E0B', txtColor:'#fcd34d'},
 ];
 
 const WEEKS = [
-  {label:'Week 1',  start:'2026-04-07', end:'2026-04-13', range:'Apr 7–13'},
-  {label:'Week 2',  start:'2026-04-14', end:'2026-04-20', range:'Apr 14–20'},
-  {label:'Week 3',  start:'2026-04-21', end:'2026-04-27', range:'Apr 21–27'},
-  {label:'Week 4',  start:'2026-04-28', end:'2026-05-04', range:'Apr 28 – May 4'},
-  {label:'Week 5',  start:'2026-05-05', end:'2026-05-11', range:'May 5–11'},
-  {label:'Week 6',  start:'2026-05-12', end:'2026-05-18', range:'May 12–18'},
-  {label:'Week 7',  start:'2026-05-19', end:'2026-05-25', range:'May 19–25'},
-  {label:'Week 8',  start:'2026-05-26', end:'2026-06-01', range:'May 26 – Jun 1'},
-  {label:'Week 9',  start:'2026-06-02', end:'2026-06-08', range:'Jun 2–8'},
-  {label:'Week 10', start:'2026-06-09', end:'2026-06-15', range:'Jun 9–15'},
-  {label:'Finals',  start:'2026-06-16', end:'2026-06-22', range:'Jun 16–22'},
+  {label:'Week 1',  start:'2026-04-06', end:'2026-04-12', range:'Apr 6–12'},
+  {label:'Week 2',  start:'2026-04-13', end:'2026-04-19', range:'Apr 13–19'},
+  {label:'Week 3',  start:'2026-04-20', end:'2026-04-26', range:'Apr 20–26'},
+  {label:'Week 4',  start:'2026-04-27', end:'2026-05-03', range:'Apr 27 – May 3'},
+  {label:'Week 5',  start:'2026-05-04', end:'2026-05-10', range:'May 4–10'},
+  {label:'Week 6',  start:'2026-05-11', end:'2026-05-17', range:'May 11–17'},
+  {label:'Week 7',  start:'2026-05-18', end:'2026-05-24', range:'May 18–24'},
+  {label:'Week 8',  start:'2026-05-25', end:'2026-05-31', range:'May 25–31'},
+  {label:'Week 9',  start:'2026-06-01', end:'2026-06-07', range:'Jun 1–7'},
+  {label:'Week 10', start:'2026-06-08', end:'2026-06-14', range:'Jun 8–14'},
+  {label:'Finals',  start:'2026-06-15', end:'2026-06-21', range:'Jun 15–21'},
 ];
 
 // score = historical avg (0-100), pass = historical pass rate (0-100)
