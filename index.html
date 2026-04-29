@@ -109,7 +109,7 @@ body.coach .score-chip{display:block}
 /* ── Modal ── */
 .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center}
 .modal-ov.open{display:flex}
-.modal-box{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:430px;width:90%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.55)}
+.modal-box{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:500px;width:92%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.55);max-height:90vh;overflow-y:auto}
 .modal-x{position:absolute;top:12px;right:12px;background:var(--surf2);border:none;color:var(--muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;line-height:1;transition:color .15s}
 .modal-x:hover{color:var(--txt)}
 .modal-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;display:inline-block;margin-bottom:10px}
@@ -127,6 +127,51 @@ body.coach .score-chip{display:block}
 .modal-nosubmit{background:var(--bg);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:14px}
 .modal-note{background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 13px;font-size:12px;color:#fde68a;line-height:1.55}
 .modal-note-lbl{font-weight:700;display:block;margin-bottom:3px;color:#f59e0b}
+
+/* ── Outreach templates (inside modal) ── */
+.modal-outreach{margin-top:14px;border-top:1px solid var(--border);padding-top:14px}
+.outreach-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.otab-bar{display:flex;gap:6px;margin-bottom:8px}
+.otab{background:var(--surf2);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.otab.active{background:var(--engl);border-color:var(--engl);color:#fff}
+.otemplate-wrap{display:flex;flex-direction:column;gap:6px}
+.otemplate-wrap.hidden{display:none}
+.otemplate{width:100%;min-height:130px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--txt);font-size:11px;line-height:1.55;resize:vertical;font-family:inherit}
+.ocopy-btn{align-self:flex-end;background:var(--surf2);border:1px solid var(--border);color:var(--txt);border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.ocopy-btn:hover{background:#334155}
+.ocopy-btn.copied{background:#166534;border-color:#4ade80;color:#4ade80}
+
+/* ── Reminders panel ── */
+.remind-btn{background:var(--gold);color:#0f172a;border:none;border-radius:7px;padding:7px 15px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:filter .15s}
+.remind-btn:hover{filter:brightness(1.12)}
+.rp{position:fixed;top:var(--hh);right:0;bottom:0;width:380px;background:var(--surf);border-left:1px solid var(--border);z-index:90;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
+.rp.open{transform:translateX(0)}
+.rp-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.rp-hdr-title{font-size:14px;font-weight:800}
+.rp-hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.rp-x{background:var(--surf2);border:none;color:var(--muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:color .15s}
+.rp-x:hover{color:var(--txt)}
+.rp-body{flex:1;overflow-y:auto;padding:12px}
+.rp-body::-webkit-scrollbar{width:5px}.rp-body::-webkit-scrollbar-track{background:transparent}.rp-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.rp-section{margin-bottom:18px}
+.rp-stitle{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.rp-stitle.urgent{color:#f87171}
+.rp-stitle.soon{color:#facc15}
+.rp-stitle.risk{color:#fb923c}
+.rp-count{background:var(--surf2);border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;color:var(--muted)}
+.rp-empty{font-size:12px;color:var(--muted);padding:6px 0;font-style:italic}
+.rp-item{background:var(--bg);border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid var(--border);cursor:pointer;transition:border-color .15s}
+.rp-item:hover{border-left-color:var(--gold)}
+.rp-item.high{border-left-color:#f87171}
+.rp-item.med{border-left-color:#fb923c}
+.rp-item-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.rp-item-course{font-size:10px;font-weight:700;margin-bottom:3px}
+.rp-item-meta{font-size:11px;color:var(--muted);line-height:1.4}
+.rp-item-remind{font-size:10px;margin-top:4px;color:#facc15;font-weight:600}
+.rp-copy-all{width:100%;margin-top:10px;background:var(--surf2);border:1px solid var(--border);color:var(--txt);border-radius:7px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
+.rp-copy-all:hover{background:#334155}
+.rp-copy-all.copied{background:#166534;border-color:#4ade80;color:#4ade80}
+.rp-divider{border:none;border-top:1px solid var(--border);margin:4px 0 12px}
 </style>
 </head>
 <body>
@@ -146,8 +191,20 @@ body.coach .score-chip{display:block}
       <span class="leg-sep">|</span>
       <div class="leg-alert">⚠ Coach Alert = pass rate &lt;65%</div>
     </div>
+    <button class="remind-btn" id="remindBtn" onclick="toggleRemindPanel()">📋 Reminders</button>
     <button class="toggle-btn" id="toggleBtn" onclick="toggleView()">Switch to Coach View</button>
   </div>
+</div>
+
+<div class="rp" id="remindPanel">
+  <div class="rp-hdr">
+    <div>
+      <div class="rp-hdr-title">Reminders &amp; Risk Report</div>
+      <div class="rp-hdr-sub">Based on today · Apr 28, 2026</div>
+    </div>
+    <button class="rp-x" onclick="toggleRemindPanel()">&#215;</button>
+  </div>
+  <div class="rp-body" id="remindBody"></div>
 </div>
 
 <div class="cal-outer" id="calOuter">
@@ -268,6 +325,66 @@ function diff(score) {
 
 function diffLabel(d) { return {easy:'Easy',mod:'Moderate',hard:'Hard',crit:'Critical'}[d] || ''; }
 
+function daysUntil(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const t = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  return Math.round((d - t) / 86400000);
+}
+
+function reminderByDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() - 3);
+  return d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+}
+
+function outreachTemplates(a, course) {
+  const days = daysUntil(a.due);
+  const isHighRisk = a.pass !== null && a.pass < 65;
+  const isMedRisk  = a.pass !== null && a.pass >= 65 && a.pass < 80;
+  const timing = days <= 0 ? 'TODAY' : days === 1 ? 'tomorrow' : `in ${days} days`;
+  const shortDate = a.time.split('·')[0].trim();
+
+  let email, sms;
+  if (isHighRisk) {
+    email = `Subject: Important Reminder — ${a.name} (${course.code}) Due ${timing.toUpperCase()}
+
+Hi [Student Name],
+
+I wanted to reach out personally about ${a.name} for ${course.code}, due ${timing} (${shortDate}).
+
+Historically this assignment has one of the lower completion rates in the course, so I want to make sure you're set up for success. If you haven't started yet, now is the time — and please don't hesitate to reach out if you need any support before the deadline.
+
+I'm here to help. Let's get this done!
+
+Best,
+[Coach Name]`;
+    sms = `Hi [Name], this is [Coach] — ${a.name} for ${course.code} is due ${timing} (${shortDate}). This one is important! Please reach out if you need help. You've got this.`;
+  } else if (isMedRisk) {
+    email = `Subject: Reminder — ${a.name} (${course.code}) Due ${timing}
+
+Hi [Student Name],
+
+Just a friendly reminder that ${a.name} for ${course.code} is due ${timing} (${shortDate}).
+
+If you have any questions or need support before the deadline, please reach out — happy to help!
+
+Best,
+[Coach Name]`;
+    sms = `Hi [Name], reminder: ${a.name} for ${course.code} is due ${timing} (${shortDate}). Let me know if you need anything! — [Coach]`;
+  } else {
+    email = `Subject: Quick Reminder — ${a.name} (${course.code})
+
+Hi [Student Name],
+
+Quick reminder that ${a.name} for ${course.code} is due ${timing} (${shortDate}). You've got this!
+
+Best,
+[Coach Name]`;
+    sms = `Hi [Name], reminder: ${a.name} for ${course.code} is due ${timing} (${shortDate}). — [Coach]`;
+  }
+  return { email, sms };
+}
+
 // ── Build grid ─────────────────────────────────────────────
 function build() {
   const grid = document.getElementById('calGrid');
@@ -354,10 +471,15 @@ function el(tag, cls, html = '') {
 }
 
 // ── Modal ──────────────────────────────────────────────────
+let _tpl = {email:'', sms:''};
+
 function openModal(a, course) {
   const dc = diff(a.score);
   const isAlert = a.pass !== null && a.pass < 65;
   const isSpecial = a.score === null;
+  const showOutreach = !isSpecial && daysUntil(a.due) >= 0;
+
+  if (showOutreach) _tpl = outreachTemplates(a, course);
 
   document.getElementById('modalBody').innerHTML = `
     <div class="modal-badge" style="background:${course.color}22;color:${course.color};border:1px solid ${course.color}44">${course.code}</div>
@@ -380,8 +502,44 @@ function openModal(a, course) {
          </div>`
     }
     <div class="modal-note"><span class="modal-note-lbl">📋 Coach Note</span>${a.note}</div>
+    ${showOutreach ? `
+    <div class="modal-outreach">
+      <div class="outreach-lbl">✉ Outreach Template</div>
+      <div class="otab-bar">
+        <button class="otab active" id="otab-email" onclick="showOTab('email')">Email</button>
+        <button class="otab" id="otab-sms" onclick="showOTab('sms')">Text / SMS</button>
+      </div>
+      <div class="otemplate-wrap" id="otemplate-email">
+        <textarea class="otemplate" id="ota-email" readonly></textarea>
+        <button class="ocopy-btn" id="ocopy-email" onclick="copyOutreach('email')">Copy</button>
+      </div>
+      <div class="otemplate-wrap hidden" id="otemplate-sms">
+        <textarea class="otemplate" id="ota-sms" readonly></textarea>
+        <button class="ocopy-btn" id="ocopy-sms" onclick="copyOutreach('sms')">Copy</button>
+      </div>
+    </div>` : ''}
   `;
+
+  if (showOutreach) {
+    document.getElementById('ota-email').value = _tpl.email;
+    document.getElementById('ota-sms').value = _tpl.sms;
+  }
   document.getElementById('modalOv').classList.add('open');
+}
+
+function showOTab(tab) {
+  ['email','sms'].forEach(t => {
+    document.getElementById(`otab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`otemplate-${t}`).classList.toggle('hidden', t !== tab);
+  });
+}
+
+function copyOutreach(which) {
+  navigator.clipboard.writeText(which === 'email' ? _tpl.email : _tpl.sms).then(() => {
+    const btn = document.getElementById(`ocopy-${which}`);
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 function closeModal() { document.getElementById('modalOv').classList.remove('open'); }
@@ -397,6 +555,78 @@ function toggleView() {
   btn.textContent = coachOn ? 'Switch to Student View' : 'Switch to Coach View';
   btn.classList.toggle('on', coachOn);
   document.getElementById('legend').classList.toggle('show', coachOn);
+}
+
+// ── Reminders panel ───────────────────────────────────────
+let remindOpen = false;
+let _bulkText = '';
+
+function toggleRemindPanel() {
+  remindOpen = !remindOpen;
+  document.getElementById('remindPanel').classList.toggle('open', remindOpen);
+  if (remindOpen) buildRemindPanel();
+}
+
+function buildRemindPanel() {
+  const future = A.filter(a => a.score !== null && daysUntil(a.due) >= 0);
+  const actionNow = future.filter(a => daysUntil(a.due) <= 3).sort((x,y) => new Date(x.due)-new Date(y.due));
+  const soonItems = future.filter(a => daysUntil(a.due) >= 4 && daysUntil(a.due) <= 7).sort((x,y) => new Date(x.due)-new Date(y.due));
+  const riskItems = A.filter(a => a.score !== null && daysUntil(a.due) >= 1 && daysUntil(a.due) <= 14 && (a.pass < 65 || a.score < 65)).sort((x,y) => new Date(x.due)-new Date(y.due));
+
+  _bulkText = `2-Week Risk Assignments — as of ${TODAY.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}\n${'─'.repeat(48)}\n\n` +
+    riskItems.map(a => {
+      const course = COURSES.find(c => c.id === a.c);
+      return `⚠ ${course.code} — ${a.name}\n   Due: ${a.time}\n   Historical pass rate: ${a.pass}% | Avg score: ${a.score}%\n   → Send reminder by: ${reminderByDate(a.due)}`;
+    }).join('\n\n');
+
+  const sec = (title, cls, items, emptyMsg) => {
+    let h = `<div class="rp-section"><div class="rp-stitle ${cls}">${title} <span class="rp-count">${items.length}</span></div>`;
+    if (!items.length) { h += `<div class="rp-empty">${emptyMsg}</div>`; }
+    else items.forEach(a => { h += rpItem(a, cls === 'urgent' || cls === 'risk' ? 'high' : 'med'); });
+    return h + '</div>';
+  };
+
+  document.getElementById('remindBody').innerHTML =
+    sec('⚡ Send Reminder Now', 'urgent', actionNow, 'No assignments due in the next 3 days.') +
+    sec('📅 Coming Up This Week', 'soon', soonItems, 'No assignments due in 4–7 days.') +
+    riskSec(riskItems);
+}
+
+function rpItem(a, urgency) {
+  const course = COURSES.find(c => c.id === a.c);
+  const days = daysUntil(a.due);
+  const dayLabel = days === 0 ? 'Due TODAY' : days === 1 ? 'Due tomorrow' : `Due in ${days} days`;
+  const isHigh = a.pass < 65;
+  return `<div class="rp-item ${isHigh ? 'high' : 'med'}" data-aid="${a.id}" onclick="rpOpenModal(this.dataset.aid)">
+    <div class="rp-item-course" style="color:${course.color}">${course.code}</div>
+    <div class="rp-item-name">${a.name}</div>
+    <div class="rp-item-meta">${a.time}${isHigh ? ` · <span style="color:#f87171">Pass rate: ${a.pass}%</span>` : ` · Pass rate: ${a.pass}%`}</div>
+    <div class="rp-item-remind">⏰ ${dayLabel} · Reminder due: ${reminderByDate(a.due)}</div>
+  </div>`;
+}
+
+function rpOpenModal(aid) {
+  const a = A.find(x => x.id === aid);
+  const course = COURSES.find(c => c.id === a.c);
+  openModal(a, course);
+}
+
+function riskSec(items) {
+  let h = `<div class="rp-section"><div class="rp-stitle risk">⚠ 2-Week Risk Report <span class="rp-count">${items.length} high-risk</span></div>`;
+  if (!items.length) { h += `<div class="rp-empty">No high-risk assignments in the next 14 days.</div>`; }
+  else {
+    items.forEach(a => { h += rpItem(a, 'high'); });
+    h += `<button class="rp-copy-all" id="rpCopyAll" onclick="doCopyAll()">Copy Full List as Text</button>`;
+  }
+  return h + '</div>';
+}
+
+function doCopyAll() {
+  navigator.clipboard.writeText(_bulkText).then(() => {
+    const btn = document.getElementById('rpCopyAll');
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Full List as Text'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 // ── Init ───────────────────────────────────────────────────
