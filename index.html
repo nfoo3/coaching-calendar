@@ -340,49 +340,18 @@ function reminderByDate(dateStr) {
 function outreachTemplates(a, course) {
   const days = daysUntil(a.due);
   const isHighRisk = a.pass !== null && a.pass < 65;
-  const isMedRisk  = a.pass !== null && a.pass >= 65 && a.pass < 80;
   const timing = days <= 0 ? 'TODAY' : days === 1 ? 'tomorrow' : `in ${days} days`;
   const shortDate = a.time.split('·')[0].trim();
 
-  let email, sms;
-  if (isHighRisk) {
-    email = `Subject: Important Reminder — ${a.name} (${course.code}) Due ${timing.toUpperCase()}
+  const standard = days <= 0
+    ? `Hi [Student], just a heads up — ${a.name} for ${course.code} is due TODAY. Make sure to submit before the deadline, and let me know if you need any last-minute help!`
+    : `Hi [Student], quick reminder that ${a.name} for ${course.code} is due ${timing} (${shortDate}). Please let me know if you need any guidance!`;
 
-Hi [Student Name],
+  const urgent = days <= 0
+    ? `Hi [Student], ${a.name} for ${course.code} is due TODAY and this is one of the more challenging submissions. Please reach out right away if you're running into any issues — I want to make sure you get this in!`
+    : `Hi [Student], just checking in — ${a.name} for ${course.code} is due ${timing} (${shortDate}). This one tends to be tricky, so please don't hesitate to reach out before the deadline. I'm here to help!`;
 
-I wanted to reach out personally about ${a.name} for ${course.code}, due ${timing} (${shortDate}).
-
-Historically this assignment has one of the lower completion rates in the course, so I want to make sure you're set up for success. If you haven't started yet, now is the time — and please don't hesitate to reach out if you need any support before the deadline.
-
-I'm here to help. Let's get this done!
-
-Best,
-[Coach Name]`;
-    sms = `Hi [Name], this is [Coach] — ${a.name} for ${course.code} is due ${timing} (${shortDate}). This one is important! Please reach out if you need help. You've got this.`;
-  } else if (isMedRisk) {
-    email = `Subject: Reminder — ${a.name} (${course.code}) Due ${timing}
-
-Hi [Student Name],
-
-Just a friendly reminder that ${a.name} for ${course.code} is due ${timing} (${shortDate}).
-
-If you have any questions or need support before the deadline, please reach out — happy to help!
-
-Best,
-[Coach Name]`;
-    sms = `Hi [Name], reminder: ${a.name} for ${course.code} is due ${timing} (${shortDate}). Let me know if you need anything! — [Coach]`;
-  } else {
-    email = `Subject: Quick Reminder — ${a.name} (${course.code})
-
-Hi [Student Name],
-
-Quick reminder that ${a.name} for ${course.code} is due ${timing} (${shortDate}). You've got this!
-
-Best,
-[Coach Name]`;
-    sms = `Hi [Name], reminder: ${a.name} for ${course.code} is due ${timing} (${shortDate}). — [Coach]`;
-  }
-  return { email, sms };
+  return { standard, urgent };
 }
 
 // ── Build grid ─────────────────────────────────────────────
@@ -504,10 +473,10 @@ function openModal(a, course) {
     <div class="modal-note"><span class="modal-note-lbl">📋 Coach Note</span>${a.note}</div>
     ${showOutreach ? `
     <div class="modal-outreach">
-      <div class="outreach-lbl">✉ Outreach Template</div>
+      <div class="outreach-lbl">💬 DM Template</div>
       <div class="otab-bar">
-        <button class="otab active" id="otab-email" onclick="showOTab('email')">Email</button>
-        <button class="otab" id="otab-sms" onclick="showOTab('sms')">Text / SMS</button>
+        <button class="otab active" id="otab-email" onclick="showOTab('email')">Standard</button>
+        <button class="otab" id="otab-sms" onclick="showOTab('sms')">Urgent</button>
       </div>
       <div class="otemplate-wrap" id="otemplate-email">
         <textarea class="otemplate" id="ota-email" readonly></textarea>
@@ -521,8 +490,8 @@ function openModal(a, course) {
   `;
 
   if (showOutreach) {
-    document.getElementById('ota-email').value = _tpl.email;
-    document.getElementById('ota-sms').value = _tpl.sms;
+    document.getElementById('ota-email').value = _tpl.standard;
+    document.getElementById('ota-sms').value = _tpl.urgent;
   }
   document.getElementById('modalOv').classList.add('open');
 }
@@ -535,7 +504,7 @@ function showOTab(tab) {
 }
 
 function copyOutreach(which) {
-  navigator.clipboard.writeText(which === 'email' ? _tpl.email : _tpl.sms).then(() => {
+  navigator.clipboard.writeText(which === 'email' ? _tpl.standard : _tpl.urgent).then(() => {
     const btn = document.getElementById(`ocopy-${which}`);
     btn.textContent = 'Copied!'; btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
@@ -568,10 +537,14 @@ function toggleRemindPanel() {
 }
 
 function buildRemindPanel() {
+  const byCourseThenDate = (x, y) => {
+    const ci = COURSES.findIndex(c => c.id === x.c) - COURSES.findIndex(c => c.id === y.c);
+    return ci !== 0 ? ci : new Date(x.due) - new Date(y.due);
+  };
   const future = A.filter(a => a.score !== null && daysUntil(a.due) >= 0);
-  const actionNow = future.filter(a => daysUntil(a.due) <= 3).sort((x,y) => new Date(x.due)-new Date(y.due));
-  const soonItems = future.filter(a => daysUntil(a.due) >= 4 && daysUntil(a.due) <= 7).sort((x,y) => new Date(x.due)-new Date(y.due));
-  const riskItems = A.filter(a => a.score !== null && daysUntil(a.due) >= 1 && daysUntil(a.due) <= 14 && (a.pass < 65 || a.score < 65)).sort((x,y) => new Date(x.due)-new Date(y.due));
+  const actionNow = future.filter(a => daysUntil(a.due) <= 3).sort(byCourseThenDate);
+  const soonItems = future.filter(a => daysUntil(a.due) >= 4 && daysUntil(a.due) <= 7).sort(byCourseThenDate);
+  const riskItems = A.filter(a => a.score !== null && daysUntil(a.due) >= 1 && daysUntil(a.due) <= 14 && (a.pass < 65 || a.score < 65)).sort(byCourseThenDate);
 
   _bulkText = `2-Week Risk Assignments — as of ${TODAY.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}\n${'─'.repeat(48)}\n\n` +
     riskItems.map(a => {
